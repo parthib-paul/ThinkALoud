@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-2.3.3-green.svg)](https://flask.palletsprojects.com)
 [![Anthropic](https://img.shields.io/badge/Anthropic-Claude-purple.svg)](https://anthropic.com)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 
 ## 🌟 Overview
 
@@ -285,49 +285,9 @@ python -m pytest tests/
 python -m pytest --cov=app tests/
 ```
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Commit your changes**: `git commit -m 'Add amazing feature'`
-4. **Push to the branch**: `git push origin feature/amazing-feature`
-5. **Open a Pull Request**
-
 ### Contribution Guidelines
 
 - Follow PEP 8 style guidelines
 - Add tests for new features
 - Update documentation as needed
 - Ensure all tests pass before submitting
-
-## 📞 Support & Contact
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/parthib-paul/ThinkALoud/issues)
-- **Email**: your-email@example.com
-- **LinkedIn**: [Your LinkedIn Profile](https://linkedin.com/in/your-profile)
-
-## 🙏 Acknowledgments
-
-- **Anthropic**: For providing the Claude AI API
-- **Flask Community**: For the excellent web framework
-- **Tailwind CSS**: For the beautiful utility-first CSS framework
-- **HackMIT 2025**: For inspiring this project
-
----
-
-**Built with ❤️ for HackMIT 2025**
-
-*Transform your study sessions with the power of AI!*
-
-## 📊 Project Stats
-
-![GitHub stars](https://img.shields.io/github/stars/parthib-paul/ThinkALoud?style=social)
-![GitHub forks](https://img.shields.io/github/forks/parthib-paul/ThinkALoud?style=social)
-![GitHub issues](https://img.shields.io/github/issues/parthib-paul/ThinkALoud)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/parthib-paul/ThinkALoud)
