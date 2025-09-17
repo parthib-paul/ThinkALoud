@@ -284,10 +284,3 @@ python -m pytest tests/
 # Run with coverage
 python -m pytest --cov=app tests/
 ```
-
-### Contribution Guidelines
-
-- Follow PEP 8 style guidelines
-- Add tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting
