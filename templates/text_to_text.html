@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Text to Text</title>
+</head>
+
+<body>
+    <h1>Daily Reflection</h1>
+    <form id="reflection-form" action="/submit_reflection" method="POST">
+        
+        <label for="work">What work did you do today?</label>
+        <textarea id="work" name="work" rows="3" required></textarea>
+
+        <label for="hours">How many hours did you work?</label>
+        <input type="number" id="hours" name="hours" min="0" step="0.1" required>
+
+        <label for="help">How did it help you?</label>
+        <textarea id="help" name="help" rows="3"></textarea>
+
+        <label for="impact">What impact did it make for your future?</label>
+        <textarea id="impact" name="impact" rows="3"></textarea>
+
+        <button type="submit">Submit Reflection</button>
+        <button type="reset">Reset</button>
+
+    </form>
+
+    {% if submitted %}
+    <hr>
+    <h2>Your Reflection</h2>
+
+    <h3>Work Done Today:</h3>
+    <p>{{ work_done }}</p>
+
+    <h3>Hours Worked:</h3>
+    <p>{{ hours_worked }}</p>
+
+    <h3>How It Helped You:</h3>
+    <p>{{ help_self }}</p>
+
+    <h3>Impact for Your Future:</h3>
+    <p>{{ future_impact }}</p>
+    {% endif %}
+
+</body>

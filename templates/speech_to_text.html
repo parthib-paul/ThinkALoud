@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Speech to Text</title>
+</head>
+
+<body>
+    <h1>Speech to Text</h1>
+    <button id="start-btn">Start Recording</button>
+    <button id="stop-btn" disabled>Stop Recording</button>
+    <button id="reset" disabled>Reset</button>
+    <p id="transcript"></p>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+document.getElementById('start-btn').onclick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.start();
+
+    document.getElementById("start-btn").disabled = true;
+    document.getElementById("stop-btn").disabled = false;
+    document.getElementById("reset").disabled = true;
+}
+
+document.getElementById('stop-btn').onclick = () => {
+    mediaRecorder.stop();
+
+    mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'speech.wav');
+
+        const res = await fetch('/speech_to_text', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+        document.getElementById("transcript").innerText = data.transcript;
+        audioChunks = [];
+    };
+
+    document.getElementById("reset").disabled = false;
+};
+
+document.getElementById('reset').onclick = () => {
+    document.getElementById("transcript").innerText = '';
+
+    document.getElementById("start-btn").disabled = false;
+    document.getElementById("stop-btn").disabled = true;
+    document.getElementById("reset").disabled = true;
+    audioChunks = [];
+};
+
+
+</script>
+</body>
+<<<<<<< HEAD
+</html>
+=======
+</html>
+>>>>>>> 4a5b20b3d296716dbf22b883e47d74a1b6659d9b

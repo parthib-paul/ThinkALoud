@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinkALoud - AI-Powered Study Assistant for Interactive Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Dynamic Particle Background */
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+        
+        .particle:nth-child(odd) {
+            animation-delay: -2s;
+            animation-duration: 8s;
+        }
+        
+        .particle:nth-child(even) {
+            animation-delay: -4s;
+            animation-duration: 10s;
+        }
+        
+        /* Floating Geometric Shapes */
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: drift 15s linear infinite;
+        }
+        
+        @keyframes drift {
+            0% { transform: translateX(-100px) rotate(0deg); }
+            100% { transform: translateX(calc(100vw + 100px)) rotate(360deg); }
+        }
+        
+        .floating-shape:nth-child(1) { top: 10%; animation-duration: 20s; }
+        .floating-shape:nth-child(2) { top: 30%; animation-duration: 25s; }
+        .floating-shape:nth-child(3) { top: 50%; animation-duration: 18s; }
+        .floating-shape:nth-child(4) { top: 70%; animation-duration: 22s; }
+        .floating-shape:nth-child(5) { top: 90%; animation-duration: 16s; }
+        
+        /* Glass Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e085f0 0%, #f04a5c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(240, 147, 251, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #3d8bfe 0%, #00e0fe 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #f85f8a 0%, #fed030 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(250, 112, 154, 0.4);
+        }
+        
+        /* Glow Effects */
+        .glow {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: rgba(59, 130, 246, 0.6);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .upload-area.dragover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Recording Animation */
+        .recording {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+    <!-- Dynamic Background -->
+    <div id="particlesContainer" class="fixed inset-0 pointer-events-none"></div>
+    <div class="fixed inset-0 pointer-events-none">
+        <div class="floating-shape w-16 h-16 bg-blue-500 rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-purple-500 rounded-lg"></div>
+        <div class="floating-shape w-20 h-20 bg-cyan-500 rounded-full"></div>
+        <div class="floating-shape w-14 h-14 bg-pink-500 rounded-lg"></div>
+        <div class="floating-shape w-18 h-18 bg-indigo-500 rounded-full"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12 fade-in">
+            <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                ThinkALoud
+            </h1>
+            <p class="text-xl text-gray-300 mb-8">
+                AI-Powered Study Assistant for Interactive Learning
+            </p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Panel: Notes Upload & Study Session -->
+            <div class="space-y-6">
+                <!-- File Upload Section -->
+                <div class="glass rounded-2xl p-6 fade-in">
+                    <h2 class="text-2xl font-bold mb-4 text-center">📚 Notes Upload & Study Session</h2>
+                    
+                    <!-- Upload Area -->
+                    <div id="uploadArea" class="upload-area rounded-xl p-8 text-center cursor-pointer mb-4">
+                        <div class="text-6xl mb-4">📁</div>
+                        <p class="text-lg mb-2">Drag & drop your study materials here</p>
+                        <p class="text-sm text-gray-400 mb-4">or click to browse files</p>
+                        <p class="text-xs text-gray-500">Supports: PDF, TXT, DOC, DOCX</p>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.txt,.doc,.docx" class="hidden">
+                    </div>
+                    
+                    <!-- Uploaded Files -->
+                    <div id="uploadedFilesContainer" class="hidden">
+                        <h3 class="text-lg font-semibold mb-3">📄 Uploaded Files</h3>
+                        <div id="fileList" class="space-y-2"></div>
+                    </div>
+                    
+                    <!-- Start Study Button -->
+                    <button id="startStudyBtn" disabled class="btn-primary w-full py-3 rounded-xl font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                        🚀 Start Study Session
+                    </button>
+                </div>
+
+                <!-- Study Progress -->
+                <div id="studyProgress" class="glass rounded-2xl p-6 hidden">
+                    <h3 class="text-xl font-bold mb-4">📊 Study Progress</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Progress</span>
+                                <span id="progressText">0/0</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-slate-800/50 rounded-lg p-3">
+                                <div class="text-2xl font-bold text-blue-400" id="questionsAnswered">0</div>
+                                <div class="text-sm text-gray-400">Questions</div>
+                            </div>
+                            <div class="bg-slate-800/50 rounded-lg p-3">
+                                <div class="text-2xl font-bold text-green-400" id="correctAnswers">0</div>
+                                <div class="text-sm text-gray-400">Correct</div>
+                            </div>
+                            <div class="bg-slate-800/50 rounded-lg p-3">
+                                <div class="text-2xl font-bold text-purple-400" id="accuracy">0%</div>
+                                <div class="text-sm text-gray-400">Accuracy</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: AI Questions & Answers -->
+            <div class="space-y-6">
+                <!-- Current Question -->
+                <div id="currentQuestion" class="glass rounded-2xl p-6 hidden">
+                    <h3 class="text-xl font-bold mb-4">❓ Current Question</h3>
+                    <div id="questionText" class="text-lg mb-6 p-4 bg-slate-800/50 rounded-lg"></div>
+                    
+                    <!-- Recording Interface -->
+                    <div class="text-center">
+                        <button id="recordBtn" class="btn-secondary px-8 py-4 rounded-full text-xl font-semibold mb-4">
+                            🎤 Record Your Answer
+                        </button>
+                        <div id="recordingStatus" class="hidden text-center">
+                            <div class="recording text-4xl mb-2">🔴</div>
+                            <p class="text-lg">Recording... Speak now!</p>
+                            <p class="text-sm text-gray-400 mt-2">Click stop when finished</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Feedback -->
+                <div id="aiFeedback" class="glass rounded-2xl p-6 hidden">
+                    <h3 class="text-xl font-bold mb-4">🤖 AI Feedback</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <h4 class="font-semibold mb-2">Your Answer:</h4>
+                            <p id="studentAnswer" class="text-gray-300"></p>
+                        </div>
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <h4 class="font-semibold mb-2">AI Score:</h4>
+                            <div class="flex items-center space-x-2">
+                                <span id="aiScore" class="text-2xl font-bold"></span>
+                                <span id="scoreText" class="text-lg"></span>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <h4 class="font-semibold mb-2">Feedback:</h4>
+                            <p id="aiFeedbackText" class="text-gray-300"></p>
+                        </div>
+                        <div class="p-4 bg-slate-800/50 rounded-lg">
+                            <h4 class="font-semibold mb-2">Suggestions:</h4>
+                            <p id="aiSuggestions" class="text-gray-300"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-4 mt-6">
+                        <button id="nextQuestionBtn" class="btn-success flex-1 py-3 rounded-xl font-semibold">
+                            ➡️ Next Question
+                        </button>
+                        <button id="followUpBtn" class="btn-primary flex-1 py-3 rounded-xl font-semibold">
+                            🔄 Follow-up Questions
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Follow-up Questions -->
+                <div id="followupQuestions" class="glass rounded-2xl p-6 hidden">
+                    <h3 class="text-xl font-bold mb-4">🔄 Follow-up Questions</h3>
+                    <div id="followupList" class="space-y-3 mb-6"></div>
+                    <div class="flex space-x-4">
+                        <button id="continueSessionBtn" class="btn-success flex-1 py-3 rounded-xl font-semibold">
+                            ➡️ Continue Session
+                        </button>
+                        <button id="newFollowupBtn" class="btn-primary flex-1 py-3 rounded-xl font-semibold">
+                            🔄 New Follow-ups
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Study Session Complete -->
+                <div id="studyComplete" class="glass rounded-2xl p-6 hidden">
+                    <h3 class="text-2xl font-bold mb-4 text-center">🎉 Study Session Complete!</h3>
+                    <div class="text-center space-y-4">
+                        <div class="text-6xl">🏆</div>
+                        <div class="text-3xl font-bold" id="finalScore"></div>
+                        <div class="text-lg text-gray-300" id="finalAccuracy"></div>
+                        <p class="text-gray-400">Great job! You've completed your study session.</p>
+                        <button id="newSessionBtn" class="btn-primary px-8 py-3 rounded-xl font-semibold">
+                             Start New Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        // Global state
+        let studySession = {
+            questions: [],
+            currentQuestionIndex: 0,
+            answers: [],
+            scores: [],
+            correctAnswers: 0,
+            isActive: false,
+            followupQuestions: [],
+            currentFollowupIndex: 0
+        };
+        
+        let uploadedFilesData = [];
+        let recognition = null;
+        let isRecording = false;
+        let currentQuestionData = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            setupFileUpload();
+            initSpeechRecognition();
+            setupEventListeners();
+        });
+
+        // Create dynamic particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particlesContainer');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 4 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // File Upload Handling with Backend Integration
+        function setupFileUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const uploadedFilesContainer = document.getElementById('uploadedFilesContainer');
+            const fileList = document.getElementById('fileList');
+            const startStudyBtn = document.getElementById('startStudyBtn');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            }
+
+            function handleDragLeave(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            }
+
+            function handleFileSelect(e) {
+                const files = e.target.files;
+                handleFiles(files);
+            }
+
+            async function handleFiles(files) {
+                if (files.length > 0) {
+                    try {
+                        const formData = new FormData();
+                        Array.from(files).forEach(file => {
+                            formData.append('files', file);
+                        });
+
+                        const response = await fetch('/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            uploadedFilesData = result.files;
+                            
+                            uploadedFilesContainer.classList.remove('hidden');
+                            fileList.innerHTML = '';
+                            
+                            result.files.forEach(file => {
+                                const fileItem = document.createElement('div');
+                                fileItem.className = 'flex items-center justify-between bg-slate-800/50 rounded-lg p-3';
+                                fileItem.innerHTML = `
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-2xl">📄</span>
+                                        <div>
+                                            <div class="text-white font-medium">${file.filename}</div>
+                                            <div class="text-sm text-gray-400">${(file.size / 1024).toFixed(1)} KB</div>
+                                        </div>
+                                    </div>
+                                    <button onclick="removeFile(this)" class="btn-danger px-3 py-1 rounded-lg text-sm">
+                                        🗑️
+                                    </button>
+                                `;
+                                fileList.appendChild(fileItem);
+                            });
+                            
+                            startStudyBtn.disabled = false;
+                            showNotification('Files uploaded successfully! Ready to start studying.', 'success');
+                        } else {
+                            showNotification('Error uploading files: ' + result.message, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Upload error:', error);
+                        showNotification('Error uploading files. Please try again.', 'error');
+                    }
+                }
+            }
+        }
+
+        function removeFile(button) {
+            button.parentElement.remove();
+            const remainingFiles = document.getElementById('fileList').children.length;
+            if (remainingFiles === 0) {
+                document.getElementById('uploadedFilesContainer').classList.add('hidden');
+                document.getElementById('startStudyBtn').disabled = true;
+                uploadedFilesData = [];
+            }
+        }
+
+        // Start Study Session with Backend Integration
+        async function startStudySession() {
+            try {
+                let content = '';
+                if (uploadedFilesData && uploadedFilesData.length > 0) {
+                    content = uploadedFilesData.map(file => file.content || '').join('\n\n');
+                }
+                
+                if (!content.trim()) {
+                    showNotification('No study material content available. Please upload files first.', 'error');
+                    return;
+                }
+
+                const response = await fetch('/generate_questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        content: content
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    studySession.questions = result.questions;
+                    studySession.currentQuestionIndex = 0;
+                    studySession.answers = [];
+                    studySession.scores = [];
+                    studySession.correctAnswers = 0;
+                    studySession.isActive = true;
+                    studySession.followupQuestions = [];
+                    studySession.currentFollowupIndex = 0;
+                    
+                    showQuestion();
+                    updateProgress();
+                    showNotification('Study session started! Answer the questions verbally.', 'success');
+                } else {
+                    showNotification('Error generating questions: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error starting study session:', error);
+                showNotification('Error starting study session. Please try again.', 'error');
+            }
+        }
+
+        // Show current question
+        function showQuestion() {
+            const currentQuestion = document.getElementById('currentQuestion');
+            const questionText = document.getElementById('questionText');
+            const studyProgress = document.getElementById('studyProgress');
+            
+            if (studySession.currentQuestionIndex < studySession.questions.length) {
+                const question = studySession.questions[studySession.currentQuestionIndex];
+                questionText.textContent = question;
+                currentQuestionData = {
+                    question: question,
+                    index: studySession.currentQuestionIndex
+                };
+                currentQuestion.classList.remove('hidden');
+                studyProgress.classList.remove('hidden');
+            } else {
+                showComplete();
+            }
+        }
+
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    processAnswer(transcript);
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    showNotification('Speech recognition error. Please try again.', 'error');
+                    updateRecordingUI(false);
+                };
+
+                recognition.onend = function() {
+                    updateRecordingUI(false);
+                };
+            } else {
+                showNotification('Speech recognition not supported in this browser.', 'error');
+            }
+        }
+
+        // Update recording UI
+        function updateRecordingUI(recording) {
+            const recordBtn = document.getElementById('recordBtn');
+            const recordingStatus = document.getElementById('recordingStatus');
+            
+            isRecording = recording;
+            
+            if (recording) {
+                recordBtn.textContent = '⏹️ Stop Recording';
+                recordBtn.classList.remove('btn-secondary');
+                recordBtn.classList.add('btn-danger');
+                recordingStatus.classList.remove('hidden');
+            } else {
+                recordBtn.textContent = '🎤 Record Your Answer';
+                recordBtn.classList.remove('btn-danger');
+                recordBtn.classList.add('btn-secondary');
+                recordingStatus.classList.add('hidden');
+            }
+        }
+
+        // Process student answer
+        async function processAnswer(answer) {
+            try {
+                const question = studySession.questions[studySession.currentQuestionIndex];
+                
+                const response = await fetch('/grade_answer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        answer: answer,
+                        content: uploadedFilesData.map(file => file.content || '').join('\n\n')
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showFeedback(answer, result);
+                } else {
+                    showNotification('Error grading answer: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error processing answer:', error);
+                showNotification('Error processing answer. Please try again.', 'error');
+            }
+        }
+
+        // Show AI feedback
+        function showFeedback(answer, result) {
+            const aiFeedback = document.getElementById('aiFeedback');
+            const studentAnswer = document.getElementById('studentAnswer');
+            const aiScore = document.getElementById('aiScore');
+            const scoreText = document.getElementById('scoreText');
+            const aiFeedbackText = document.getElementById('aiFeedbackText');
+            const aiSuggestions = document.getElementById('aiSuggestions');
+
+            studentAnswer.textContent = answer;
+            aiScore.textContent = result.score + '/10';
+            scoreText.textContent = result.is_correct ? '✅ Correct!' : '❌ Needs Improvement';
+            aiFeedbackText.textContent = result.feedback;
+            aiSuggestions.textContent = result.suggestions;
+
+            // Update score colors
+            if (result.score >= 8) {
+                aiScore.className = 'text-2xl font-bold text-green-400';
+            } else if (result.score >= 6) {
+                aiScore.className = 'text-2xl font-bold text-yellow-400';
+            } else {
+                aiScore.className = 'text-2xl font-bold text-red-400';
+            }
+
+            // Store the answer and score
+            studySession.answers.push(answer);
+            studySession.scores.push(result.score);
+            if (result.is_correct) {
+                studySession.correctAnswers++;
+            }
+
+            // Store current question data for follow-ups
+            currentQuestionData = {
+                ...currentQuestionData,
+                answer: answer,
+                score: result.score
+            };
+
+            aiFeedback.classList.remove('hidden');
+            updateProgress();
+        }
+
+        // Next question
+        function nextQuestion() {
+            studySession.currentQuestionIndex++;
+            document.getElementById('aiFeedback').classList.add('hidden');
+            document.getElementById('followupQuestions').classList.add('hidden');
+            showQuestion();
+        }
+
+        // Generate follow-up questions
+        async function generateFollowupQuestions() {
+            try {
+                if (!currentQuestionData) {
+                    showNotification('No question data available for follow-ups.', 'error');
+                    return;
+                }
+
+                const response = await fetch('/generate_followup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: currentQuestionData.question,
+                        answer: currentQuestionData.answer,
+                        score: currentQuestionData.score,
+                        content: uploadedFilesData.map(file => file.content || '').join('\n\n')
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    studySession.followupQuestions = result.questions;
+                    studySession.currentFollowupIndex = 0;
+                    showFollowupQuestions();
+                } else {
+                    showNotification('Error generating follow-up questions: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error generating follow-up questions:', error);
+                showNotification('Error generating follow-up questions. Please try again.', 'error');
+            }
+        }
+
+        // Show follow-up questions
+        function showFollowupQuestions() {
+            const followupContainer = document.getElementById('followupQuestions');
+            const followupList = document.getElementById('followupList');
+            
+            followupList.innerHTML = '';
+            
+            studySession.followupQuestions.forEach((question, index) => {
+                const questionItem = document.createElement('div');
+                questionItem.className = 'p-4 bg-slate-800/50 rounded-lg';
+                questionItem.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <span class="text-lg font-bold text-blue-400">${index + 1}.</span>
+                        <p class="text-gray-300">${question}</p>
+                    </div>
+                `;
+                followupList.appendChild(questionItem);
+            });
+            
+            document.getElementById('aiFeedback').classList.add('hidden');
+            followupContainer.classList.remove('hidden');
+        }
+
+        // Continue session from follow-ups
+        function continueSession() {
+            document.getElementById('followupQuestions').classList.add('hidden');
+            nextQuestion();
+        }
+
+        // Generate new follow-up questions
+        function newFollowupQuestions() {
+            generateFollowupQuestions();
+        }
+
+        // Show completion screen
+        function showComplete() {
+            const studyComplete = document.getElementById('studyComplete');
+            const finalScore = document.getElementById('finalScore');
+            const finalAccuracy = document.getElementById('finalAccuracy');
+            
+            const totalScore = studySession.scores.reduce((sum, score) => sum + score, 0);
+            const averageScore = (totalScore / studySession.scores.length).toFixed(1);
+            const accuracy = ((studySession.correctAnswers / studySession.questions.length) * 100).toFixed(1);
+            
+            finalScore.textContent = `Final Score: ${averageScore}/10`;
+            finalAccuracy.textContent = `Accuracy: ${accuracy}%`;
+            
+            studyComplete.classList.remove('hidden');
+            document.getElementById('currentQuestion').classList.add('hidden');
+            document.getElementById('studyProgress').classList.add('hidden');
+            document.getElementById('aiFeedback').classList.add('hidden');
+            document.getElementById('followupQuestions').classList.add('hidden');
+            
+            saveSession();
+        }
+
+        // Save study session
+        async function saveSession() {
+            try {
+                const totalScore = studySession.scores.reduce((sum, score) => sum + score, 0);
+                const accuracy = (studySession.correctAnswers / studySession.questions.length) * 100;
+                
+                await fetch('/save_session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        questions: studySession.questions,
+                        answers: studySession.answers,
+                        scores: studySession.scores,
+                        total_score: totalScore,
+                        accuracy: accuracy
+                    })
+                });
+            } catch (error) {
+                console.error('Error saving session:', error);
+            }
+        }
+
+        // Update progress
+        function updateProgress() {
+            const progressText = document.getElementById('progressText');
+            const progressBar = document.getElementById('progressBar');
+            const questionsAnswered = document.getElementById('questionsAnswered');
+            const correctAnswers = document.getElementById('correctAnswers');
+            const accuracy = document.getElementById('accuracy');
+            
+            const current = studySession.currentQuestionIndex;
+            const total = studySession.questions.length;
+            const progress = (current / total) * 100;
+            
+            progressText.textContent = `${current}/${total}`;
+            progressBar.style.width = `${progress}%`;
+            questionsAnswered.textContent = current;
+            correctAnswers.textContent = studySession.correctAnswers;
+            accuracy.textContent = total > 0 ? Math.round((studySession.correctAnswers / total) * 100) + '%' : '0%';
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('startStudyBtn').addEventListener('click', startStudySession);
+            document.getElementById('recordBtn').addEventListener('click', toggleRecording);
+            document.getElementById('nextQuestionBtn').addEventListener('click', nextQuestion);
+            document.getElementById('followUpBtn').addEventListener('click', generateFollowupQuestions);
+            document.getElementById('continueSessionBtn').addEventListener('click', continueSession);
+            document.getElementById('newFollowupBtn').addEventListener('click', newFollowupQuestions);
+            document.getElementById('newSessionBtn').addEventListener('click', () => {
+                location.reload();
+            });
+        }
+
+        // Toggle recording
+        function toggleRecording() {
+            if (!recognition) {
+                showNotification('Speech recognition not available.', 'error');
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+                updateRecordingUI(true);
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+            
+            notification.className = `${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg slide-in`;
+            notification.textContent = message;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
