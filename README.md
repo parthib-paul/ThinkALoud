@@ -20,7 +20,7 @@ ThinkALoud is an innovative AI-powered study assistant that revolutionizes how s
 - 📈 **Progress Analytics**: Track your learning progress with visual metrics
 - 🎨 **Modern UI**: Beautiful, responsive design with dynamic animations
 - 🔄 **Adaptive Learning**: Follow-up questions based on your performance
-- 🛡️ **Fallback Mode**: Works perfectly even without API keys
+
 
 ## 🚀 Quick Start
 
